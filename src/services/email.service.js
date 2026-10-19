@@ -1,35 +1,24 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-// Passwords spaces fix
-const emailUser = (process.env.EMAIL_USER || '').trim();
-const emailPass = (process.env.EMAIL_PASS || '').replace(/\s+/g, '');
-
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: emailUser,
-    pass: emailPass
-  }
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async ({ to, subject, html }) => {
   try {
-    if (!emailUser || !emailPass) {
-      throw new Error("EMAIL_USER ya EMAIL_PASS environment variables missing hain!");
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error("RESEND_API_KEY environment variable missing hai!");
     }
 
-    const mailOptions = {
-      from: `"Udaan Fast Track" <${emailUser}>`,
-      to,
-      subject,
-      html
-    };
+    const data = await resend.emails.send({
+      from: 'Udaan Fast Track <onboarding@resend.dev>', // Testing ke liye Resend ka default verified domain
+      to: [to],
+      subject: subject,
+      html: html
+    });
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('✅ Email sent successfully to %s: %s', to, info.messageId);
-    return { success: true, messageId: info.messageId };
+    console.log('✅ Resend Email sent successfully:', data);
+    return { success: true, data };
   } catch (error) {
-    console.error('❌ Nodemailer Error Detail:', error.message);
+    console.error('❌ Resend Error:', error);
     throw new Error(`Email sending failed: ${error.message}`);
   }
 };
