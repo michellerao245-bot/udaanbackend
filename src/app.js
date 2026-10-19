@@ -7,8 +7,8 @@ const app = express();
 
 // ==================== CORS CONFIGURATION ====================
 
-const allowedOrigins = [
-  'https://udaancompanyadminpanel-yp87.vercel.app'
+const allowedOrigins = [ 
+  'https://udaancompanyadminpanel-yp87.vercel.app' 
 ];
 
 app.use(cors({
