@@ -7,6 +7,16 @@ const registerCompany = async (req, res) => {
   try {
     const { companyName, ownerName, email, phone, password } = req.body;
 
+    // Diagnostic log: secret values print nahi hongi
+    console.log('Registration fields received:', {
+      bodyKeys: Object.keys(req.body || {}),
+      companyName: !!companyName,
+      ownerName: !!ownerName,
+      email: !!email,
+      phone: !!phone,
+      password: !!password
+    });
+
     if (!companyName || !ownerName || !email || !phone || !password) {
       return errorResponse(res, 'Saare fields zaroori hain', 400);
     }
@@ -130,7 +140,7 @@ const getSubscription = async (req, res) => {
   }
 };
 
-// ==================== ⭐ USER STATS ====================
+// ==================== USER STATS ====================
 const getUserStats = async (req, res) => {
   try {
     const { companyId } = req.user;
@@ -147,9 +157,11 @@ const getUser = async (req, res) => {
   try {
     const { companyId } = req.user;
     const user = await companyService.getUserById(companyId, req.params.id);
+
     if (!user) {
       return errorResponse(res, 'User not found', 404);
     }
+
     return successResponse(res, user, 'User fetched');
   } catch (error) {
     return errorResponse(res, error.message, 400);
@@ -183,18 +195,20 @@ const resetPassword = async (req, res) => {
   try {
     const { companyId } = req.user;
     const { newPassword } = req.body;
+
     const user = await companyService.resetUserPassword(
       companyId,
       req.params.id,
       newPassword
     );
+
     return successResponse(res, user, 'Password reset successful');
   } catch (error) {
     return errorResponse(res, error.message, 400);
   }
 };
 
-// ==================== 🎁 SCHEME PASSWORD ====================
+// ==================== SCHEME PASSWORD ====================
 
 // SET
 const setSchemePassword = async (req, res) => {
@@ -225,6 +239,7 @@ const verifySchemePassword = async (req, res) => {
     const { companyId } = req.user;
     const { password } = req.body;
     const result = await companyService.verifySchemePassword(companyId, password);
+
     return successResponse(
       res,
       result,
@@ -256,7 +271,7 @@ module.exports = {
   getDistributors,
   resetPassword,
 
-  // 🎁 Scheme Password
+  // Scheme Password
   setSchemePassword,
   getSchemePassword,
   verifySchemePassword,
